@@ -35,4 +35,8 @@ class ProjectSerializer(serializers.ModelSerializer):
             if "version" not in package.keys():
                 package["version"] = list(versions)[-1]
 
+        project = Project.objects.create(name=validated_data["name"])
+        for package in packages:
+            PackageRelease.objects.create(project=project, **package)
+
         return Project(name=validated_data["name"])
