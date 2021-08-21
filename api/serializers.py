@@ -1,7 +1,7 @@
 from rest_framework import serializers
 
 from .models import PackageRelease, Project
-from api.package_validation import package_versions
+from api.package_validation import package_validation
 
 
 class PackageSerializer(serializers.ModelSerializer):
@@ -24,16 +24,9 @@ class ProjectSerializer(serializers.ModelSerializer):
         # - Persistir informações no banco
         packages = validated_data["packages"]
         for package in packages:
-            versions = package_versions(package["name"])
-            if versions == "error":
-                return {"error": "One or more packages don't exist"}
-            if (
-                "version" in package.keys()
-                and package["version"] not in versions
-            ):
-                return {"error": "One or more packages don't exist"}
-            if "version" not in package.keys():
-                package["version"] = list(versions)[-1]
+            package = package_validation(package)
+            if "error" in package.keys():
+                raise serializers.ValidationError(package, code=400)
 
         project = Project.objects.create(name=validated_data["name"])
         for package in packages:

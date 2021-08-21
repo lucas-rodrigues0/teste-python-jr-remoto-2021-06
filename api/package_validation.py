@@ -9,3 +9,15 @@ def package_versions(package_name):
 
     versions = data.json()["releases"].keys()
     return versions
+
+
+def package_validation(package):
+    versions = package_versions(package["name"])
+    if versions == "error":
+        return {"error": "One or more packages don't exist"}
+    if "version" in package.keys() and package["version"] not in versions:
+        print(package["version"])
+        return {"error": "One or more packages don't exist"}
+    if "version" not in package.keys():
+        package["version"] = list(versions)[-1]
+    return package
