@@ -1,7 +1,8 @@
 import requests
 
 
-def versions(package_name):
+def package_versions(package_name):
+    """Returns from the PyPI API a list of versions of the given package."""
     url = "https://pypi.org/pypi/%s/json" % (package_name,)
     data = requests.get(url)
     if data.status_code == 404:
@@ -9,6 +10,3 @@ def versions(package_name):
 
     versions = data.json()["releases"].keys()
     return versions
-
-
-print(versions("Django"))
