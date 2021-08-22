@@ -19,9 +19,7 @@ class ProjectSerializer(serializers.ModelSerializer):
     packages = PackageSerializer(many=True)
 
     def create(self, validated_data):
-        # TODO
-        # - Processar os pacotes recebidos
-        # - Persistir informações no banco
+
         packages = validated_data["packages"]
         for package in packages:
             package = package_validation(package)
