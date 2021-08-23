@@ -3,7 +3,7 @@ from django.test import TestCase, Client
 from unittest.mock import Mock, patch
 
 from rest_framework import status
-from rest_framework.test import APITestCase, APIClient
+from rest_framework.test import APITestCase, APIClient, RequestsClient
 from rest_framework import serializers
 
 from api.serializers import ProjectSerializer
@@ -94,15 +94,24 @@ class PackageValidationTestCase(TestCase):
         self.assertEquals(expected, result)
 
 
-# class ApiSerializerTestCase(TestCase):
-#     def setup(self):
-#         self.serializer_data = {
-#             "name": "project_name",
-#             "packages": [{"name": "valid_package"}],
-#         }
-#         self.serializer = ProjectSerializer(instance=self.serializer_data)
+class ApiSerializerTestCase(TestCase):
+    def setUp(self):
+        patcher = patch("api.package_validation")
+        self.addCleanup(patcher.stop)
+        self.mock_validation = patcher.start()
+        self.mock_ok_response = {"name": "graphene", "version": "2.0"}
 
-#     def test_ProjectSerializer_create_project_success(self):
-#         data = self.serializer.data
-#         self.assertEqual(data.keys(), ["name", "packages"])
-#         pass
+    def test_ProjectSerializer_create_project_success(self):
+        self.mock_validation.return_value = self.mock_ok_response
+        data = {
+            "name": "titan",
+            "packages": [
+                {"name": "graphene", "version": "2.0"},
+            ],
+        }
+        projectSerializer = ProjectSerializer()
+        project_create = projectSerializer.create(data)
+
+        assert "name" in project_create and "packages" in project_create
+        self.assertEquals(Project.objects.count(), 1)
+        self.assertEquals(PackageRelease.objects.count(), 1)
