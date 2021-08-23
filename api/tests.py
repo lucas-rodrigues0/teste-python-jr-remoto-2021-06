@@ -1,11 +1,9 @@
-import json
-from django.test import TestCase, Client
+from django.test import TestCase
 from unittest.mock import Mock, patch
 
 from rest_framework import status
 from rest_framework.exceptions import ValidationError
-from rest_framework.test import APITestCase, APIClient, RequestsClient
-from rest_framework import serializers
+from rest_framework.test import APITestCase, APIClient
 
 from api.serializers import ProjectSerializer
 from api.package_validation import package_validation, package_versions
@@ -26,9 +24,6 @@ class PackageValidationTestCase(TestCase):
         }
         self.expected_ok_response = self.mock_ok_response["releases"].keys()
         self.expected_error_response = "error"
-        self.expected_error_message_response = {
-            "error": "One or more packages doesn't exist"
-        }
 
     def test_get_package_versions(self):
         self.mock_get.return_value = Mock(status_code=200)
@@ -62,7 +57,7 @@ class PackageValidationTestCase(TestCase):
 
         self.assertEquals(expected, result)
 
-    def test_package_validation_success_and_add_newest_version(self):
+    def test_package_validation_success_and_add_latest_version(self):
         self.mock_get.return_value = Mock(status_code=200)
         self.mock_get.return_value.json.return_value = self.mock_ok_response
 
@@ -78,21 +73,21 @@ class PackageValidationTestCase(TestCase):
         self.mock_get.return_value.json.return_value = self.mock_ok_response
 
         package = {"name": "valid_package", "version": "1.2.3"}
-        expected = self.expected_error_message_response
 
-        result = package_validation(package)
-
-        self.assertEquals(expected, result)
+        with self.assertRaisesMessage(
+            ValidationError, "One or more packages doesn't exist"
+        ):
+            package_validation(package)
 
     def test_package_validation_with_an_invalid_package_name(self):
         self.mock_get.return_value = Mock(status_code=404)
 
         package = {"name": "invalid_package", "version": "1.2.3"}
-        expected = self.expected_error_message_response
 
-        result = package_validation(package)
-
-        self.assertEquals(expected, result)
+        with self.assertRaisesMessage(
+            ValidationError, "One or more packages doesn't exist"
+        ):
+            package_validation(package)
 
 
 class ApiSerializerTestCase(TestCase):
