@@ -1,5 +1,16 @@
 # API REST MagPy
 
+---
+
+### sumário
+  - [Instruções](#instruções)
+  - [Instalação](#instalação)
+  - [Testes existentes](#testes-existentes)
+  - [Considerações finais](#considerações-finais)
+
+---
+
+## Instruções
 
 MagPy é uma API REST que gerencia uma coleção de projetos. <br >
 Cada projeto tem um nome e uma lista de pacotes. <br >
@@ -80,8 +91,9 @@ Depois da instalação crie seu super usuario para a sessão de admin do Django 
 ``` 
   $ python manage.py createsuperuser
 ```
-Suba a aplicação para o servidor com o comando:
+Faça a migration e suba a aplicação para o servidor com o comando:
 ``` 
+  $ python manage.py migrate
   $ python manage.py runserver
 ```
 e acesse pelo browser a interface pela url, substituindo o `<port>` pela porta em que estiver servindo.
@@ -110,6 +122,11 @@ ____________________________________________________________________
 ## Considerações finais
 
 Esse projeto fez parte de um desafio técnico em que tive que implementar apenas parte das funcionalidades, já tendo uma estrutura pronta e o teste de carga implementados.
+
+E apesar de ser o meu primeiro contato com o Django consegui aprender bastante.
+
+Algumas sugestões para escalabilidade seriam a implementação de uma função para atualizar o projeto registrado e outra para ver os detalhes de cada pacote, que poderiam de forma simples acrescentar mais valor a Api.
+
 Qualquer dúvida pode entrar em contato.
 
 ### Tecnologias
@@ -119,5 +136,5 @@ Qualquer dúvida pode entrar em contato.
 - Django Rest Framework 3.12.0
 
 
-Deploy no Heroku. Link de acesso:
-__inserir link__
+Deploy no Heroku. Link de acesso: <br >
+[magpy_heroku](https://magpy-api-rest-0705.herokuapp.com/api/projects/)
