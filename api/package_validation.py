@@ -1,16 +1,16 @@
-import requests
 from rest_framework import serializers
+
+from external_api.pypi_packages import get_package_pypi
 
 
 def package_versions(package_name):
-    """GET a package from the public PyPI Api.
+    """Get package from the public Api.
 
     If package not found return a error string.
 
     Returns a list of versions from the package.
     """
-    url = "https://pypi.org/pypi/%s/json" % (package_name,)
-    data = requests.get(url)
+    data = get_package_pypi(package_name)
     if data.status_code == 404:
         return "error"
 
@@ -26,14 +26,13 @@ def package_validation(package):
     Return the package validated.
     """
     versions = package_versions(package["name"])
-    if versions == "error":
+    if versions == "error" or (
+        "version" in package.keys() and package["version"] not in versions
+    ):
         raise serializers.ValidationError(
             {"error": "One or more packages doesn't exist"}, code=400
         )
-    if "version" in package.keys() and package["version"] not in versions:
-        raise serializers.ValidationError(
-            {"error": "One or more packages doesn't exist"}, code=400
-        )
+
     if "version" not in package.keys():
-        package["version"] = list(versions)[-1]
+        package["version"] = list(versions).pop()
     return package
