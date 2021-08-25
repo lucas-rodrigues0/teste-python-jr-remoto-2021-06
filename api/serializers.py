@@ -1,7 +1,7 @@
 from rest_framework import serializers
 
 from .models import PackageRelease, Project
-from api.package_validation import package_validation
+from .package_validation import package_validation
 
 
 class PackageSerializer(serializers.ModelSerializer):
